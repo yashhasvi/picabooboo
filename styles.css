@@ -14,16 +14,16 @@ body {
 
 h1 {
     color: #1e88e5;
-    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-    margin: clamp(20px, 5vh, 60px) 0 20px;
+    margin: clamp(15px, 4vh, 30px) 0 15px;
 }
 
 .video-container {
     position: relative;
     width: min(90vw, 640px);
-    height: calc(min(90vw, 640px) * 0.75);
-    margin-bottom: 20px;
+    aspect-ratio: 4 / 3;
+    margin-bottom: 15px;
 }
 
 #video, #videoCanvas {
@@ -46,6 +46,7 @@ h1 {
 #frameCanvas {
     width: min(90vw, 360px);
     height: auto;
+    aspect-ratio: 0.5625 / 1;
     border: 6px solid #fff;
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -64,10 +65,10 @@ h1 {
 .frame-controls select, .frame-controls button {
     flex: 1;
     min-width: 100px;
-    max-width: 150px;
+    max-width: 140px;
     padding: 8px;
     border-radius: 20px;
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    font-size: clamp(0.8rem, 1.8vw, 0.9rem);
     background: #fff;
     border: 2px solid #64b5f6;
     color: #1e88e5;
@@ -82,6 +83,16 @@ h1 {
     transition: background 0.2s, transform 0.2s;
 }
 
+.frame-controls button:hover {
+    background: #1976d2;
+    transform: translateY(-2px);
+}
+
+.frame-controls button:disabled {
+    background: #b0bec5;
+    cursor: not-allowed;
+}
+
 .edit-controls {
     display: flex;
     flex-direction: column;
@@ -93,10 +104,27 @@ h1 {
 
 .text-controls {
     display: flex;
+    flex-direction: row;
     gap: 10px;
     width: 100%;
     justify-content: center;
-    flex-wrap: wrap;
+    align-items: center;
+}
+
+.text-controls input, .text-controls select {
+    flex: 1;
+    min-width: 100px;
+    max-width: 200px;
+    padding: 8px;
+    font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+    border: 2px solid #64b5f6;
+    border-radius: 10px;
+    color: #1e88e5;
+}
+
+.text-controls input:focus, .text-controls select:focus {
+    outline: none;
+    border-color: #1976d2;
 }
 
 button {
@@ -105,7 +133,7 @@ button {
     padding: 8px 16px;
     border-radius: 20px;
     color: #fff;
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    font-size: clamp(0.8rem, 1.8vw, 0.9rem);
     cursor: pointer;
     transition: background 0.2s, transform 0.2s;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -125,7 +153,7 @@ button:disabled {
 select {
     padding: 8px;
     border-radius: 20px;
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    font-size: clamp(0.8rem, 1.8vw, 0.9rem);
     background: #fff;
     border: 2px solid #64b5f6;
     color: #1e88e5;
@@ -141,7 +169,7 @@ select:focus {
     display: none;
     flex-direction: column;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 15px;
     width: min(90vw, 360px);
 }
 
@@ -173,27 +201,6 @@ select:focus {
     width: clamp(40px, 10vw, 60px);
 }
 
-#downloadNoteInput {
-    padding: 8px;
-    width: min(200px, 90%);
-    font-size: clamp(0.8rem, 2vw, 1rem);
-    border: 2px solid #64b5f6;
-    border-radius: 10px;
-}
-
-#downloadNoteInput:focus {
-    outline: none;
-    border-color: #1976d2;
-}
-
-#fontSelect {
-    padding: 8px;
-    width: min(150px, 40%);
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-    border: 2px solid #64b5f6;
-    border-radius: 10px;
-}
-
 .cloud {
     position: absolute;
     opacity: 0.3;
@@ -210,7 +217,7 @@ select:focus {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: clamp(2rem, 8vw, 3rem);
+    font-size: clamp(2rem, 6vw, 2.5rem);
     color: white;
     background-color: rgba(0, 0, 0, 0.7);
     padding: 10px;
@@ -223,12 +230,12 @@ select:focus {
         padding: 10px;
     }
     h1 {
-        font-size: clamp(1.2rem, 4vw, 1.8rem);
-        margin: 20px 0 10px;
+        font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+        margin: 15px 0 10px;
     }
     .video-container {
         width: 90vw;
-        height: calc(90vw * 0.75);
+        aspect-ratio: 4 / 3;
     }
     .frame-controls {
         flex-direction: column;
@@ -238,16 +245,22 @@ select:focus {
     .frame-controls select, .frame-controls button {
         width: 100%;
         max-width: 100%;
-        font-size: clamp(0.7rem, 2vw, 0.8rem);
+        font-size: clamp(0.7rem, 1.6vw, 0.8rem);
     }
     .edit-controls {
         width: 90vw;
     }
     .text-controls {
-        flex-direction: column;
-        align-items: center;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
     }
-    #downloadNoteInput, #fontSelect, button {
+    .text-controls input, .text-controls select {
+        min-width: 100px;
+        max-width: 150px;
+        font-size: clamp(0.7rem, 1.6vw, 0.8rem);
+    }
+    button {
         width: 100%;
         max-width: 100%;
     }

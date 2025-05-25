@@ -1,4 +1,3 @@
-// DOM Elements
 const video = document.getElementById('video');
 const videoCanvas = document.getElementById('videoCanvas');
 const frameCanvas = document.getElementById('frameCanvas');
@@ -30,14 +29,14 @@ function resizeCanvases() {
     tempCanvas.height = maxWidth / aspectRatio;
 
     const frameCount = parseInt(frameSelect.value);
-    const canvasSizes = {
-        1: { width: maxWidth * 0.5625, height: maxWidth * 0.775 },
-        2: { width: maxWidth * 0.5625, height: maxWidth * 1.2 },
-        3: { width: maxWidth * 0.5625, height: maxWidth * 1.625 },
-        4: { width: maxWidth * 0.5625, height: maxWidth * 2.05 }
-    };
-    frameCanvas.width = canvasSizes[frameCount].width;
-    frameCanvas.height = canvasSizes[frameCount].height;
+    const photoAspectRatio = 4 / 3;
+    const photoWidth = maxWidth * 0.5625;
+    const photoHeight = photoWidth / photoAspectRatio;
+    const framePadding = photoWidth * 0.1;
+    const frameHeight = (photoHeight + framePadding) * frameCount + framePadding;
+
+    frameCanvas.width = photoWidth + framePadding * 2;
+    frameCanvas.height = frameHeight;
 }
 
 async function startWebcam() {
@@ -213,14 +212,15 @@ async function capturePhoto(timer, filter, showNext) {
 async function createPolaroidFrame(numPhotos) {
     const canvasWidth = frameCanvas.width;
     const canvasHeight = frameCanvas.height;
-    const photoWidth = canvasWidth * 0.956;
-    const photoHeight = photoWidth * 0.667;
-    const spacing = canvasHeight / (numPhotos + 1);
+    const photoWidth = canvasWidth * 0.9;
+    const photoHeight = photoWidth / (4 / 3);
+    const padding = canvasWidth * 0.05;
+    const spacing = (canvasHeight - (numPhotos * photoHeight) - padding * 2) / (numPhotos + 1);
 
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-    let yOffset = spacing * 0.1;
+    let yOffset = padding + spacing;
     for (let i = 0; i < numPhotos; i++) {
         try {
             await new Promise((resolve, reject) => {
@@ -229,10 +229,10 @@ async function createPolaroidFrame(numPhotos) {
                 img.onload = () => {
                     ctx.save();
                     ctx.beginPath();
-                    ctx.roundRect(canvasWidth * 0.022, yOffset, photoWidth, photoHeight, 20);
+                    ctx.roundRect(padding, yOffset, photoWidth, photoHeight, 10);
                     ctx.closePath();
                     ctx.clip();
-                    ctx.drawImage(img, canvasWidth * 0.022, yOffset, photoWidth, photoHeight);
+                    ctx.drawImage(img, padding, yOffset, photoWidth, photoHeight);
                     ctx.restore();
                     console.log(`Photo ${i + 1} rendered at y=${yOffset}`);
                     resolve();
@@ -245,7 +245,7 @@ async function createPolaroidFrame(numPhotos) {
         } catch (err) {
             console.error('Rendering error:', err);
         }
-        yOffset += spacing;
+        yOffset += photoHeight + spacing;
     }
 
     updateFrameText();
@@ -284,7 +284,6 @@ function downloadFrame() {
     }
 }
 
-// Initialize
 window.onload = async () => {
     console.log('Initializing app...');
     const success = await startWebcam();
