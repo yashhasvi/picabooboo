@@ -30,10 +30,10 @@ function resizeCanvases() {
 
     const frameCount = parseInt(frameSelect.value);
     const photoAspectRatio = 4 / 3;
-    const photoWidth = maxWidth * 0.5625;
+    const photoWidth = maxWidth * 0.8; // Adjusted to match CSS padding
     const photoHeight = photoWidth / photoAspectRatio;
-    const framePadding = photoWidth * 0.1;
-    const frameHeight = (photoHeight + framePadding) * frameCount + framePadding;
+    const framePadding = maxWidth * 0.1; // Equal padding on both sides
+    const frameHeight = (photoHeight + framePadding) * frameCount + framePadding * 2;
 
     frameCanvas.width = photoWidth + framePadding * 2;
     frameCanvas.height = frameHeight;
@@ -212,9 +212,9 @@ async function capturePhoto(timer, filter, showNext) {
 async function createPolaroidFrame(numPhotos) {
     const canvasWidth = frameCanvas.width;
     const canvasHeight = frameCanvas.height;
-    const photoWidth = canvasWidth * 0.9;
+    const photoWidth = canvasWidth * 0.8; // Match resizeCanvases
     const photoHeight = photoWidth / (4 / 3);
-    const padding = canvasWidth * 0.05;
+    const padding = canvasWidth * 0.1; // Equal padding
     const spacing = (canvasHeight - (numPhotos * photoHeight) - padding * 2) / (numPhotos + 1);
 
     ctx.fillStyle = '#fff';
