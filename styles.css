@@ -36,8 +36,8 @@ h1 {
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background: #fff;
-    object-fit: cover; /* Prevent compression and maintain aspect ratio */
-    transform: scaleX(-1); /* Restore original mirroring */
+    object-fit: cover;
+    transform: scaleX(-1);
 }
 
 #videoCanvas {
@@ -178,10 +178,11 @@ select:focus {
 .polaroid-frame {
     position: relative;
     background: #fff;
-    padding: 15px; /* Equal padding for consistent spacing */
+    padding: 10px; /* Adjusted for mobile consistency */
     border: 2px solid #e0e0e0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: min(90vw, 360px);
+    width: 100%; /* Full width on mobile */
+    max-width: 360px; /* Consistent max width */
     box-sizing: border-box;
     display: flex;
     justify-content: center;
@@ -272,6 +273,10 @@ select:focus {
     }
     .polaroid-frame {
         width: 90vw;
-        padding: 10px;
+        padding: 8px; /* Reduced for mobile to ensure visibility */
+        max-width: none; /* Remove max-width constraint on mobile */
+    }
+    .edit-container {
+        width: 90vw;
     }
 }

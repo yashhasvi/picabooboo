@@ -30,13 +30,18 @@ function resizeCanvases() {
 
     const frameCount = parseInt(frameSelect.value);
     const photoAspectRatio = 4 / 3;
-    const photoWidth = maxWidth * 0.8; // Adjusted to match CSS padding
+    const photoWidth = maxWidth * 0.85; // Adjusted for mobile visibility
     const photoHeight = photoWidth / photoAspectRatio;
-    const framePadding = maxWidth * 0.1; // Equal padding on both sides
+    const framePadding = maxWidth * 0.075; // Reduced padding for mobile
     const frameHeight = (photoHeight + framePadding) * frameCount + framePadding * 2;
 
     frameCanvas.width = photoWidth + framePadding * 2;
     frameCanvas.height = frameHeight;
+
+    // Force canvas redraw on mobile
+    if (photos.length > 0) {
+        createPolaroidFrame(frameCount);
+    }
 }
 
 async function startWebcam() {
@@ -212,9 +217,9 @@ async function capturePhoto(timer, filter, showNext) {
 async function createPolaroidFrame(numPhotos) {
     const canvasWidth = frameCanvas.width;
     const canvasHeight = frameCanvas.height;
-    const photoWidth = canvasWidth * 0.8; // Match resizeCanvases
+    const photoWidth = canvasWidth * 0.85; // Match resizeCanvases
     const photoHeight = photoWidth / (4 / 3);
-    const padding = canvasWidth * 0.1; // Equal padding
+    const padding = canvasWidth * 0.075; // Match resizeCanvases
     const spacing = (canvasHeight - (numPhotos * photoHeight) - padding * 2) / (numPhotos + 1);
 
     ctx.fillStyle = '#fff';
@@ -229,7 +234,7 @@ async function createPolaroidFrame(numPhotos) {
                 img.onload = () => {
                     ctx.save();
                     ctx.beginPath();
-                    ctx.roundRect(padding, yOffset, photoWidth, photoHeight, 10);
+                    ctx.roundRect(pading, yOffset, photoWidth, photoHeight, 10);
                     ctx.closePath();
                     ctx.clip();
                     ctx.drawImage(img, padding, yOffset, photoWidth, photoHeight);
