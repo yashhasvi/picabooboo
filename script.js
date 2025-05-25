@@ -16,12 +16,29 @@ const editContainer = document.getElementById('editContainer');
 const videoCtx = videoCanvas.getContext('2d');
 const ctx = frameCanvas.getContext('2d');
 const tempCanvas = document.createElement('canvas');
-tempCanvas.width = 640;
-tempCanvas.height = 480;
 const tempCtx = tempCanvas.getContext('2d');
 
 let photos = [];
 let animationFrameId = null;
+
+function resizeCanvases() {
+    const maxWidth = Math.min(window.innerWidth * 0.9, 640);
+    const aspectRatio = 4 / 3;
+    videoCanvas.width = maxWidth;
+    videoCanvas.height = maxWidth / aspectRatio;
+    tempCanvas.width = maxWidth;
+    tempCanvas.height = maxWidth / aspectRatio;
+
+    const frameCount = parseInt(frameSelect.value);
+    const canvasSizes = {
+        1: { width: maxWidth * 0.5625, height: maxWidth * 0.775 },
+        2: { width: maxWidth * 0.5625, height: maxWidth * 1.2 },
+        3: { width: maxWidth * 0.5625, height: maxWidth * 1.625 },
+        4: { width: maxWidth * 0.5625, height: maxWidth * 2.05 }
+    };
+    frameCanvas.width = canvasSizes[frameCount].width;
+    frameCanvas.height = canvasSizes[frameCount].height;
+}
 
 async function startWebcam() {
     console.log('Starting webcam...');
@@ -38,10 +55,12 @@ async function startWebcam() {
     }
 
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
         video.srcObject = stream;
         await video.play();
+        resizeCanvases();
         video.onplay = () => applyFilterToVideo();
+        window.addEventListener('resize', resizeCanvases);
         window.addEventListener('beforeunload', () => {
             if (video.srcObject) {
                 video.srcObject.getTracks().forEach(track => track.stop());
@@ -61,6 +80,8 @@ async function startWebcam() {
 
 function applyFilter(imageData, filter) {
     const data = imageData.data;
+    const width = imageData.width;
+    const height = imageData.height;
     if (filter === 'grayscale') {
         for (let i = 0; i < data.length; i += 4) {
             const avg = 0.3 * data[i] + 0.59 * data[i + 1] + 0.11 * data[i + 2];
@@ -75,15 +96,15 @@ function applyFilter(imageData, filter) {
         }
     } else if (filter === 'blur') {
         const newData = new Uint8ClampedArray(data);
-        for (let y = 8; y < 472; y += 8) {
-            for (let x = 8; x < 632; x += 8) {
-                const i = (y * 640 + x) * 4;
+        for (let y = 8; y < height - 8; y += 8) {
+            for (let x = 8; x < width - 8; x += 8) {
+                const i = (y * width + x) * 4;
                 let r = 0, g = 0, b = 0, count = 0;
                 for (let dy = -1; dy <= 1; dy++) {
                     for (let dx = -1; dx <= 1; dx++) {
                         const ny = y + dy, nx = x + dx;
-                        if (ny >= 0 && ny < 480 && nx >= 0 && nx < 640) {
-                            const ni = (ny * 640 + nx) * 4;
+                        if (ny >= 0 && ny < height && nx >= 0 && nx < width) {
+                            const ni = (ny * width + nx) * 4;
                             r += data[ni];
                             g += data[ni + 1];
                             b += data[ni + 2];
@@ -96,7 +117,7 @@ function applyFilter(imageData, filter) {
                 newData[i + 2] = b / count;
             }
         }
-        return new ImageData(newData, 640, 480);
+        return new ImageData(newData, width, height);
     }
     return imageData;
 }
@@ -110,10 +131,10 @@ function applyFilterToVideo() {
     video.style.display = 'none';
 
     videoCtx.clearRect(0, 0, videoCanvas.width, videoCanvas.height);
-    videoCtx.drawImage(video, 0, 0, 640, 480);
+    videoCtx.drawImage(video, 0, 0, videoCanvas.width, videoCanvas.height);
 
     if (filter !== 'none') {
-        const imageData = videoCtx.getImageData(0, 0, 640, 480);
+        const imageData = videoCtx.getImageData(0, 0, videoCanvas.width, videoCanvas.height);
         videoCtx.putImageData(applyFilter(imageData, filter), 0, 0);
     }
     animationFrameId = requestAnimationFrame(applyFilterToVideo);
@@ -130,17 +151,10 @@ async function startCapture() {
     editContainer.style.display = 'none';
     startCaptureBtn.disabled = true;
 
-    const frameCount = parseInt(frameSelect.value);
-    const canvasSizes = {
-        1: { width: 360, height: 496 },
-        2: { width: 360, height: 768 },
-        3: { width: 360, height: 1040 },
-        4: { width: 360, height: 1312 }
-    };
-    frameCanvas.width = canvasSizes[frameCount].width;
-    frameCanvas.height = canvasSizes[frameCount].height;
+    resizeCanvases();
     frameCanvas.style.display = 'block';
 
+    const frameCount = parseInt(frameSelect.value);
     const timer = parseInt(timerSelect.value);
     const filter = filterSelect.value;
 
@@ -178,17 +192,16 @@ async function capturePhoto(timer, filter, showNext) {
         nextPictureElement.style.display = 'none';
     }
 
-    // Wait for the next frame to ensure stable capture
     await new Promise(resolve => requestAnimationFrame(resolve));
-    await new Promise(resolve => setTimeout(resolve, 50)); // Additional buffer
+    await new Promise(resolve => setTimeout(resolve, 50));
 
     tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
     tempCtx.save();
-    tempCtx.scale(-1, 1); // Flip to correct orientation
-    tempCtx.drawImage(video, -640, 0, 640, 480);
+    tempCtx.scale(-1, 1);
+    tempCtx.drawImage(video, -tempCanvas.width, 0, tempCanvas.width, tempCanvas.height);
     tempCtx.restore();
 
-    let imageData = tempCtx.getImageData(0, 0, 640, 480);
+    let imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
     if (filter !== 'none') {
         imageData = applyFilter(imageData, filter);
     }
@@ -198,10 +211,16 @@ async function capturePhoto(timer, filter, showNext) {
 }
 
 async function createPolaroidFrame(numPhotos) {
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, frameCanvas.width, frameCanvas.height);
+    const canvasWidth = frameCanvas.width;
+    const canvasHeight = frameCanvas.height;
+    const photoWidth = canvasWidth * 0.956;
+    const photoHeight = photoWidth * 0.667;
+    const spacing = canvasHeight / (numPhotos + 1);
 
-    let yOffset = 16;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+    let yOffset = spacing * 0.1;
     for (let i = 0; i < numPhotos; i++) {
         try {
             await new Promise((resolve, reject) => {
@@ -210,10 +229,10 @@ async function createPolaroidFrame(numPhotos) {
                 img.onload = () => {
                     ctx.save();
                     ctx.beginPath();
-                    ctx.roundRect(8, yOffset, 344, 240, 20);
+                    ctx.roundRect(canvasWidth * 0.022, yOffset, photoWidth, photoHeight, 20);
                     ctx.closePath();
                     ctx.clip();
-                    ctx.drawImage(img, 8, yOffset, 344, 240);
+                    ctx.drawImage(img, canvasWidth * 0.022, yOffset, photoWidth, photoHeight);
                     ctx.restore();
                     console.log(`Photo ${i + 1} rendered at y=${yOffset}`);
                     resolve();
@@ -226,28 +245,30 @@ async function createPolaroidFrame(numPhotos) {
         } catch (err) {
             console.error('Rendering error:', err);
         }
-        yOffset += 272;
+        yOffset += spacing;
     }
 
     updateFrameText();
 }
 
 function updateFrameText() {
+    const canvasWidth = frameCanvas.width;
+    const canvasHeight = frameCanvas.height;
     ctx.fillStyle = '#fff';
-    ctx.fillRect(0, frameCanvas.height - 80, frameCanvas.width, 80);
+    ctx.fillRect(0, canvasHeight - canvasWidth * 0.222, canvasWidth, canvasWidth * 0.222);
 
     const noteText = downloadNoteInput.value.trim();
     if (noteText) {
         ctx.fillStyle = '#000';
-        ctx.font = `18px ${fontSelect.value}`;
+        ctx.font = `${canvasWidth * 0.05}px ${fontSelect.value}`;
         ctx.textAlign = 'center';
-        ctx.fillText(noteText, frameCanvas.width / 2, frameCanvas.height - 55);
+        ctx.fillText(noteText, canvasWidth / 2, canvasHeight - canvasWidth * 0.153);
     }
 
     ctx.fillStyle = '#1e88e5';
-    ctx.font = '18px Bubblegum Sans';
+    ctx.font = `${canvasWidth * 0.05}px Bubblegum Sans`;
     ctx.textAlign = 'center';
-    ctx.fillText('Picaboo', frameCanvas.width / 2, frameCanvas.height - 20);
+    ctx.fillText('Picaboo', canvasWidth / 2, canvasHeight - canvasWidth * 0.056);
 }
 
 function downloadFrame() {
