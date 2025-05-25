@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picaboo PhotoBooth</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Great+Vibes&family=Roboto&family=Lobster&family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <img src="https://img.icons8.com/emoji/24/000000/cloud-emoji.png" class="cloud cloud1" alt="cloud">
+    <img src="https://img.icons8.com/emoji/24/000000/cloud-emoji.png" class="cloud cloud2" alt="cloud">
+    <img src="https://img.icons8.com/emoji/24/000000/cloud-emoji.png" class="cloud cloud3" alt="cloud">
+    <h1>Picaboo PhotoBooth</h1>
+    <div class="video-container">
+        <video id="video" width="640" height="480" autoplay playsinline></video>
+        <canvas id="videoCanvas" width="640" height="480"></canvas>
+    </div>
+    <div id="countdown"></div>
+    <div id="nextPicture" class="announcement">Next picture!</div>
+    <div class="frame-controls">
+        <select id="timerSelect">
+            <option value="1">1s Timer</option>
+            <option value="2">2s Timer</option>
+            <option value="3" selected>3s Timer</option>
+            <option value="4">4s Timer</option>
+            <option value="5">5s Timer</option>
+        </select>
+        <select id="frameSelect">
+            <option value="1">1 Photo Frame</option>
+            <option value="2">2 Photo Frame</option>
+            <option value="3">3 Photo Frame</option>
+            <option value="4">4 Photo Frame</option>
+        </select>
+        <select id="filterSelect">
+            <option value="none">No Filter</option>
+            <option value="grayscale">Grayscale</option>
+            <option value="sepia">Sepia</option>
+            <option value="blur">Blur</option>
+        </select>
+        <button id="startCaptureBtn">Start Capture</button>
+    </div>
+    <div id="editContainer" class="edit-container" style="display: none;">
+        <img src="https://img.icons8.com/emoji/24/000000/cloud-emoji.png" class="cloud cloud1" alt="cloud">
+    <img src="https://img.icons8.com/emoji/24/000000/cloud-emoji.png" class="cloud cloud2" alt="cloud">
+    <img src="https://img.icons8.com/emoji/24/000000/cloud-emoji.png" class="cloud cloud3" alt="cloud">
+        <div id="frameContainer" class="polaroid-frame">
+            <img src="https://img.icons8.com/emoji/24/000000/cloud-emoji.png" class="frame-cloud frame-cloud1" alt="cloud">
+            <img src="https://img.icons8.com/emoji/24/000000/cloud-emoji.png" class="frame-cloud frame-cloud2" alt="cloud">
+            <canvas id="frameCanvas"></canvas>
+        </div>
+        <div class="edit-controls">
+            <div class="text-controls">
+                <input type="text" id="downloadNoteInput" maxlength="50" placeholder="Enter note">
+                <select id="fontSelect">
+                    <option value="Great Vibes">Great Vibes</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Lobster">Lobster</option>
+                    <option value="Open Sans">Open Sans</option>
+                </select>
+            </div>
+            <button onclick="downloadFrame()">Download Frame</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
