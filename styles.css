@@ -51,6 +51,7 @@ h1 {
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     background: #fff;
+    display: block; /* Ensure canvas is visible */
 }
 
 .frame-controls {
@@ -178,11 +179,11 @@ select:focus {
 .polaroid-frame {
     position: relative;
     background: #fff;
-    padding: 10px; /* Adjusted for mobile consistency */
+    padding: 10px;
     border: 2px solid #e0e0e0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%; /* Full width on mobile */
-    max-width: 360px; /* Consistent max width */
+    width: 100%;
+    max-width: 360px;
     box-sizing: border-box;
     display: flex;
     justify-content: center;
@@ -272,11 +273,17 @@ select:focus {
         max-width: 100%;
     }
     .polaroid-frame {
-        width: 90vw;
-        padding: 8px; /* Reduced for mobile to ensure visibility */
-        max-width: none; /* Remove max-width constraint on mobile */
+        width: 100%;
+        padding: 8px;
+        max-width: 320px; /* Slightly smaller for mobile */
+        margin: 0 auto; /* Center on mobile */
     }
     .edit-container {
-        width: 90vw;
+        width: 100%;
+        max-width: 320px; /* Match polaroid-frame */
+        margin: 0 auto;
+    }
+    #frameCanvas {
+        max-width: 100%; /* Ensure canvas fits container */
     }
 }

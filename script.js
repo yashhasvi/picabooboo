@@ -21,7 +21,8 @@ let photos = [];
 let animationFrameId = null;
 
 function resizeCanvases() {
-    const maxWidth = Math.min(window.innerWidth * 0.9, 640);
+    const isMobile = window.innerWidth <= 600;
+    const maxWidth = isMobile ? window.innerWidth * 0.9 : Math.min(window.innerWidth * 0.9, 640);
     const aspectRatio = 4 / 3;
     videoCanvas.width = maxWidth;
     videoCanvas.height = maxWidth / aspectRatio;
@@ -30,16 +31,16 @@ function resizeCanvases() {
 
     const frameCount = parseInt(frameSelect.value);
     const photoAspectRatio = 4 / 3;
-    const photoWidth = maxWidth * 0.85; // Adjusted for mobile visibility
+    const photoWidth = maxWidth * 0.85;
     const photoHeight = photoWidth / photoAspectRatio;
-    const framePadding = maxWidth * 0.075; // Reduced padding for mobile
+    const framePadding = maxWidth * 0.075;
     const frameHeight = (photoHeight + framePadding) * frameCount + framePadding * 2;
 
     frameCanvas.width = photoWidth + framePadding * 2;
     frameCanvas.height = frameHeight;
 
-    // Force canvas redraw on mobile
-    if (photos.length > 0) {
+    // Force redraw on mobile after resize
+    if (photos.length > 0 && isMobile) {
         createPolaroidFrame(frameCount);
     }
 }
@@ -217,11 +218,12 @@ async function capturePhoto(timer, filter, showNext) {
 async function createPolaroidFrame(numPhotos) {
     const canvasWidth = frameCanvas.width;
     const canvasHeight = frameCanvas.height;
-    const photoWidth = canvasWidth * 0.85; // Match resizeCanvases
+    const photoWidth = canvasWidth * 0.85;
     const photoHeight = photoWidth / (4 / 3);
-    const padding = canvasWidth * 0.075; // Match resizeCanvases
+    const padding = canvasWidth * 0.075;
     const spacing = (canvasHeight - (numPhotos * photoHeight) - padding * 2) / (numPhotos + 1);
 
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight); // Clear canvas before drawing
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
@@ -234,7 +236,7 @@ async function createPolaroidFrame(numPhotos) {
                 img.onload = () => {
                     ctx.save();
                     ctx.beginPath();
-                    ctx.roundRect(pading, yOffset, photoWidth, photoHeight, 10);
+                    ctx.roundRect(padding, yOffset, photoWidth, photoHeight, 10);
                     ctx.closePath();
                     ctx.clip();
                     ctx.drawImage(img, padding, yOffset, photoWidth, photoHeight);
